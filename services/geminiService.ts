@@ -2,12 +2,6 @@ import { GoogleGenAI } from "@google/genai";
 import { UserInputs, PlatformResult, CalculationMethod } from "../types";
 import { formatCurrency, formatPercent } from "../utils/currency";
 
-const getClient = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) return null;
-  return new GoogleGenAI({ apiKey });
-};
-
 const getNumber = (value: number | string): number => {
   if (typeof value === 'number') return value;
   if (!value) return 0;
@@ -22,10 +16,8 @@ export const generatePricingAnalysis = async (
   amazonResult: PlatformResult,
   method: CalculationMethod
 ): Promise<string> => {
-  const client = getClient();
-  if (!client) {
-    return "API Key não configurada. Configure process.env.API_KEY para usar a IA.";
-  }
+  // Inicialização obrigatória dentro da função para capturar a chave de ambiente mais recente
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const methodText = method === CalculationMethod.TARGET_MARGIN 
     ? "Definição de Preço por Margem Alvo" 
@@ -62,23 +54,23 @@ export const generatePricingAnalysis = async (
     *   **Amazon:** [Resumo rápido]
     
     ### 💡 Plano de Ação
-    [Uma sugestão tática e concreta.]
+    [Uma sugestão tática e concreta para aumentar a margem ou reduzir custos.]
 
     **Regras Importantes de Estilo:**
     - Use Markdown.
-    - **IMPORTANTE:** Pule SEMPRE uma linha em branco entre cada item de lista e cada parágrafo. O texto deve ser arejado.
+    - Pule SEMPRE uma linha em branco entre cada item de lista e cada parágrafo.
     - Seja conciso e direto.
     - Use emojis para guiar a leitura.
   `;
 
   try {
-    const response = await client.models.generateContent({
-      model: 'gemini-2.5-flash',
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
       contents: prompt,
     });
     return response.text || "Não foi possível gerar a análise no momento.";
   } catch (error) {
     console.error("Erro ao chamar Gemini:", error);
-    return "Erro ao conectar com a inteligência artificial. Tente novamente.";
+    return "Erro ao conectar com a inteligência artificial. Verifique se a API_KEY foi configurada no Netlify.";
   }
 };
