@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import CalculatorInputs from './components/CalculatorInputs';
 import ResultCard from './components/ResultCard';
-import AiInsight from './components/AiInsight';
 import { UserInputs, CalculationMethod, CalculationContext } from './types';
 import { calculateResults } from './utils/calculations';
 
 const App: React.FC = () => {
   const [method, setMethod] = useState<CalculationMethod>(CalculationMethod.TARGET_MARGIN);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const aiSectionRef = useRef<HTMLDivElement>(null);
   
   const [inputs, setInputs] = useState<UserInputs>({
     productCost: 30.00,
@@ -40,10 +38,6 @@ const App: React.FC = () => {
       ...prev,
       [platform]: !prev[platform]
     }));
-  };
-
-  const scrollToAI = () => {
-    aiSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const PlatformTogglesContent = () => (
@@ -88,18 +82,6 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen pb-12 relative bg-[#f8fafc]">
       
-      {/* Floating AI Bubble */}
-      <button 
-        onClick={scrollToAI}
-        className="fixed bottom-6 right-6 z-[100] bg-indigo-600 text-white p-4 rounded-full shadow-2xl ai-bubble-pulse hover:bg-indigo-700 transition-all flex items-center space-x-2 border-2 border-white"
-        title="Ver Análise da IA"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-        </svg>
-        <span className="hidden sm:inline font-bold text-sm">IA Insight</span>
-      </button>
-
       {/* Mobile Menu Drawer */}
       <div className={`fixed inset-0 z-[110] lg:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
@@ -146,7 +128,7 @@ const App: React.FC = () => {
              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Precifica<span className="text-indigo-600">Multi</span></h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Netlify Ready</span>
+            <a href="#" className="hidden sm:block text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">Documentação</a>
           </div>
         </div>
       </header>
@@ -184,20 +166,6 @@ const App: React.FC = () => {
              ) : (
                 <div className="bg-gray-50 border border-gray-200 border-dashed rounded-xl h-64 flex flex-col items-center justify-center text-center p-6 text-gray-400 font-medium">Ative as plataformas para ver os cálculos.</div>
              )}
-          </div>
-
-          {/* AI Insight Section */}
-          <div ref={aiSectionRef}>
-            {results && (
-              <AiInsight 
-                inputs={inputs}
-                shopeeResult={results.shopee}
-                tiktokResult={results.tiktok}
-                mlResult={results.mercadolivre}
-                amazonResult={results.amazon}
-                method={method}
-              />
-            )}
           </div>
         </div>
       </main>
