@@ -57,19 +57,6 @@ const App: React.FC = () => {
             </button>
         </div>
 
-        {/* Mercado Livre Toggle */}
-        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-gray-700 pl-2">Mercado Livre</span>
-            </div>
-            <button 
-                onClick={() => togglePlatform('mercadolivre')}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${visiblePlatforms.mercadolivre ? 'bg-[#ffe600]' : 'bg-gray-200'}`}
-            >
-                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${visiblePlatforms.mercadolivre ? 'translate-x-5' : 'translate-x-0'}`} />
-            </button>
-        </div>
-
         {/* TikTok Toggle */}
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
               <div className="flex items-center space-x-3">
@@ -80,6 +67,19 @@ const App: React.FC = () => {
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${visiblePlatforms.tiktok ? 'bg-black' : 'bg-gray-200'}`}
             >
                 <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${visiblePlatforms.tiktok ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+        </div>
+
+        {/* Mercado Livre Toggle */}
+        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium text-gray-700 pl-2">Mercado Livre</span>
+            </div>
+            <button 
+                onClick={() => togglePlatform('mercadolivre')}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${visiblePlatforms.mercadolivre ? 'bg-[#ffe600]' : 'bg-gray-200'}`}
+            >
+                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${visiblePlatforms.mercadolivre ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
         </div>
 
@@ -115,7 +115,7 @@ const App: React.FC = () => {
 
          {/* Drawer Panel */}
          <div className={`absolute top-0 left-0 bottom-0 w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-            <div className="p-6 h-full flex flex-col">
+            <div className="p-6 h-full flex flex-col overflow-y-auto">
               <div className="flex items-center justify-between mb-8">
                  <h2 className="text-xl font-bold text-gray-900">Configurações</h2>
                  <button 
@@ -138,10 +138,33 @@ const App: React.FC = () => {
                  <PlatformTogglesContent />
               </div>
 
-              <div className="mt-auto bg-indigo-50 p-4 rounded-xl">
-                 <p className="text-xs text-indigo-800 leading-relaxed">
-                   Ative ou desative as plataformas acima para personalizar sua visualização de cálculo.
-                 </p>
+              {/* Added Guia Rapido to Mobile Drawer */}
+              <div className="mt-4 pt-6 border-t border-gray-100">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Guia Rápido</h4>
+                  <div className="space-y-4">
+                      <div className="flex items-start">
+                        <span className="mr-3">🎯</span>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">Margem Alvo</p>
+                            <p className="text-xs text-gray-500">Descubra o preço ideal.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="mr-3">💰</span>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">Lucro Real</p>
+                            <p className="text-xs text-gray-500">Teste um preço de venda.</p>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div className="mt-auto pt-8">
+                <div className="bg-indigo-50 p-4 rounded-xl">
+                   <p className="text-xs text-indigo-800 leading-relaxed font-medium">
+                     Ative as plataformas para comparar as taxas automaticamente.
+                   </p>
+                </div>
               </div>
             </div>
          </div>
@@ -226,6 +249,10 @@ const App: React.FC = () => {
                         onShopeeListingTypeChange={(type) => setInputs(prev => ({ ...prev, shopeeListingType: type }))}
                       />
                     )}
+                    {/* TikTok before ML as per preference */}
+                    {visiblePlatforms.tiktok && (
+                      <ResultCard result={results.tiktok} colorTheme="black" />
+                    )}
                     {visiblePlatforms.mercadolivre && (
                       <ResultCard 
                         result={results.mercadolivre} 
@@ -233,9 +260,6 @@ const App: React.FC = () => {
                         mlListingType={inputs.mlListingType}
                         onMlListingTypeChange={(type) => setInputs(prev => ({ ...prev, mlListingType: type }))}
                       />
-                    )}
-                    {visiblePlatforms.tiktok && (
-                      <ResultCard result={results.tiktok} colorTheme="black" />
                     )}
                     {visiblePlatforms.amazon && (
                       <ResultCard result={results.amazon} colorTheme="blue" />
@@ -252,6 +276,32 @@ const App: React.FC = () => {
                     <p className="text-gray-500 text-sm mt-1">Ative as plataformas no menu para ver os cálculos.</p>
                 </div>
              )}
+          </div>
+
+          {/* Quick Help Footer for Mobile Only */}
+          <div className="xl:hidden bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+             <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2 text-indigo-500">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                Guia Rápido de Métodos
+             </h3>
+             <div className="space-y-4">
+                <div className="flex items-start">
+                   <span className="text-xl mr-3">🎯</span>
+                   <div>
+                      <p className="text-sm font-bold text-gray-900">Margem Alvo</p>
+                      <p className="text-xs text-gray-600">Calcula o preço de venda ideal com base no lucro que você deseja receber livre.</p>
+                   </div>
+                </div>
+                <div className="flex items-start">
+                   <span className="text-xl mr-3">💰</span>
+                   <div>
+                      <p className="text-sm font-bold text-gray-900">Lucro Real</p>
+                      <p className="text-xs text-gray-600">Analisa quanto sobra em reais após descontar taxas de um preço que você já definiu.</p>
+                   </div>
+                </div>
+             </div>
           </div>
         </div>
 
