@@ -10,7 +10,6 @@ interface CalculatorInputsProps {
 
 const CalculatorInputs: React.FC<CalculatorInputsProps> = ({ inputs, setInputs, method, setMethod }) => {
   
-  // Allow string or number value to be set directly
   const handleChange = (field: keyof UserInputs, value: string | boolean) => {
     setInputs(prev => ({ ...prev, [field]: value }));
   };
@@ -24,11 +23,8 @@ const CalculatorInputs: React.FC<CalculatorInputsProps> = ({ inputs, setInputs, 
       e.preventDefault();
       if (nextFieldId) {
         const nextElement = document.getElementById(nextFieldId);
-        if (nextElement) {
-          nextElement.focus();
-        }
+        if (nextElement) nextElement.focus();
       } else {
-        // Se for o último campo, remove o foco (útil para fechar teclado mobile)
         e.currentTarget.blur();
       }
     }
@@ -88,13 +84,11 @@ const CalculatorInputs: React.FC<CalculatorInputsProps> = ({ inputs, setInputs, 
               onClick={() => handleChange('isCNPJ', !inputs.isCNPJ)}
               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${inputs.isCNPJ ? 'bg-blue-600' : 'bg-gray-200'}`}
             >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${inputs.isCNPJ ? 'translate-x-5' : 'translate-x-0'}`}
-              />
+              <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${inputs.isCNPJ ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
         </div>
 
-        <div className="hidden lg:block w-px bg-gray-200 h-12 mx-2"></div>
+        <div className="hidden lg:block w-px bg-gray-200 h-12 mx-1"></div>
 
         {/* Action Button Desktop */}
         <div className="hidden lg:block">
@@ -203,19 +197,6 @@ const CalculatorInputs: React.FC<CalculatorInputsProps> = ({ inputs, setInputs, 
             />
           </div>
         )}
-      </div>
-
-      {/* Clear Button Mobile Only */}
-      <div className="mt-6 pt-6 border-t border-gray-100 lg:hidden">
-        <button
-          onClick={handleClear}
-          className="w-full flex items-center justify-center space-x-2 py-2.5 border border-gray-200 text-gray-500 rounded-lg hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all text-sm font-medium"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-          </svg>
-          <span>Limpar Dados</span>
-        </button>
       </div>
     </div>
   );

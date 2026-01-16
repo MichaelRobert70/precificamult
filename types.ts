@@ -1,4 +1,3 @@
-
 export enum CalculationMethod {
   TARGET_MARGIN = 'TARGET_MARGIN',
   REAL_PROFIT = 'REAL_PROFIT'
@@ -12,7 +11,7 @@ export interface UserInputs {
   isCNPJ: boolean; // Toggle CNPJ
   taxRate: number | string; // Alíquota de Imposto %
   mlListingType: 'classic' | 'premium'; // Tipo de Anúncio ML
-  shopeeListingType: 'standard' | 'free_shipping'; // Novo campo: Tipo de Anúncio Shopee
+  shopeeListingType: 'standard' | 'free_shipping'; // Tipo de Anúncio Shopee
 }
 
 export interface PlatformResult {
@@ -20,6 +19,7 @@ export interface PlatformResult {
   sellingPrice: number;
   netProfit: number;
   netProfitMargin: number;
+  productBaseCost: number;
   totalFixedCosts: number;
   totalVariableCosts: number;
   feesBreakdown: {
