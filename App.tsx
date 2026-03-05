@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CalculatorInputs from './components/CalculatorInputs';
 import ResultCard from './components/ResultCard';
+import AiInsight from './components/AiInsight';
 import { UserInputs, CalculationMethod, CalculationContext } from './types';
 import { calculateResults } from './utils/calculations';
 
@@ -17,6 +18,9 @@ const App: React.FC = () => {
     taxRate: '',
     mlListingType: 'classic',
     shopeeListingType: 'free_shipping',
+    useMLCategory: false,
+    mlCategory: '',
+    mlShippingCost: '',
   });
 
   const [visiblePlatforms, setVisiblePlatforms] = useState({
@@ -128,7 +132,7 @@ const App: React.FC = () => {
              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Precifica<span className="text-indigo-600">Multi</span></h1>
           </div>
           <div className="flex items-center space-x-4">
-            <a href="#" className="hidden sm:block text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">Documentação</a>
+            <span className="hidden sm:block text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">v2.1 - Ajuste Frete ML</span>
           </div>
         </div>
       </header>
@@ -140,13 +144,16 @@ const App: React.FC = () => {
                <CalculatorInputs inputs={inputs} setInputs={setInputs} method={method} setMethod={setMethod} />
             </div>
             <div className="hidden xl:block xl:col-span-3 h-full">
-                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm h-full">
+                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm h-full flex flex-col">
                     <h3 className="flex items-center text-sm font-bold text-gray-900 mb-4">Plataformas Ativas</h3>
                     <PlatformTogglesContent />
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Guia Rápido</h4>
-                        <p className="text-xs text-gray-500 mb-2">🎯 <strong>Margem Alvo:</strong> Descubra o preço ideal.</p>
-                        <p className="text-xs text-gray-500">💰 <strong>Lucro Real:</strong> Teste um preço de venda.</p>
+                    <div className="mt-auto pt-6 border-t border-gray-100">
+                        <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                          <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-2">Dica de Especialista</h4>
+                          <p className="text-[11px] text-indigo-700 leading-relaxed">
+                            No Mercado Livre, o frete grátis é obrigatório para produtos acima de R$ 79. Não esqueça de inserir o custo do frete no campo específico!
+                          </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -154,15 +161,25 @@ const App: React.FC = () => {
 
           <div>
              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Comparativo de Resultados</h2>
+                <h2 className="text-xl font-bold text-gray-800">Painel Comparativo</h2>
              </div>
              {results && hasAnyPlatformVisible ? (
-                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {visiblePlatforms.shopee && <ResultCard result={results.shopee} colorTheme="orange" shopeeListingType={inputs.shopeeListingType} onShopeeListingTypeChange={(type) => setInputs(prev => ({ ...prev, shopeeListingType: type }))} />}
-                    {visiblePlatforms.tiktok && <ResultCard result={results.tiktok} colorTheme="black" />}
-                    {visiblePlatforms.mercadolivre && <ResultCard result={results.mercadolivre} colorTheme="yellow" mlListingType={inputs.mlListingType} onMlListingTypeChange={(type) => setInputs(prev => ({ ...prev, mlListingType: type }))} />}
-                    {visiblePlatforms.amazon && <ResultCard result={results.amazon} colorTheme="blue" />}
-                 </div>
+                 <>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {visiblePlatforms.shopee && <ResultCard result={results.shopee} colorTheme="orange" shopeeListingType={inputs.shopeeListingType} onShopeeListingTypeChange={(type) => setInputs(prev => ({ ...prev, shopeeListingType: type }))} />}
+                      {visiblePlatforms.tiktok && <ResultCard result={results.tiktok} colorTheme="black" />}
+                      {visiblePlatforms.mercadolivre && <ResultCard result={results.mercadolivre} colorTheme="yellow" mlListingType={inputs.mlListingType} onMlListingTypeChange={(type) => setInputs(prev => ({ ...prev, mlListingType: type }))} />}
+                      {visiblePlatforms.amazon && <ResultCard result={results.amazon} colorTheme="blue" />}
+                   </div>
+                   <AiInsight 
+                     inputs={inputs}
+                     shopeeResult={results.shopee}
+                     tiktokResult={results.tiktok}
+                     mlResult={results.mercadolivre}
+                     amazonResult={results.amazon}
+                     method={method}
+                   />
+                 </>
              ) : (
                 <div className="bg-gray-50 border border-gray-200 border-dashed rounded-xl h-64 flex flex-col items-center justify-center text-center p-6 text-gray-400 font-medium">Ative as plataformas para ver os cálculos.</div>
              )}

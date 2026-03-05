@@ -12,6 +12,9 @@ export interface UserInputs {
   taxRate: number | string; // Alíquota de Imposto %
   mlListingType: 'classic' | 'premium'; // Tipo de Anúncio ML
   shopeeListingType: 'standard' | 'free_shipping'; // Tipo de Anúncio Shopee
+  useMLCategory: boolean; // Ativar taxas por categoria
+  mlCategory: string; // Categoria selecionada
+  mlShippingCost: number | string; // Custo de frete pago pelo vendedor no ML
 }
 
 export interface PlatformResult {
@@ -27,7 +30,9 @@ export interface PlatformResult {
     transactionFee: number;
     fixedFee: number;
     tax: number;
+    shipping?: number;
     affiliate?: number;
+    serviceFee?: number;
   };
 }
 

@@ -39,9 +39,9 @@ const ResultCard: React.FC<ResultCardProps> = ({
     yellow: { // Mercado Livre
       border: 'border-yellow-200',
       bg: 'bg-white',
-      header: 'bg-yellow-400',
-      text: 'text-yellow-700',
-      fill: '#facc15'
+      header: 'bg-[#ffe600]',
+      text: 'text-[#333333]',
+      fill: '#ffe600'
     },
     blue: { // Amazon
       border: 'border-slate-200',
@@ -54,32 +54,29 @@ const ResultCard: React.FC<ResultCardProps> = ({
 
   const currentTheme = themeClasses[colorTheme];
 
-  // Taxas Totais (Marketplace + Impostos)
+  // Taxas Totais (Marketplace + Frete + Impostos)
   const totalFees = result.totalVariableCosts + 
                     result.feesBreakdown.fixedFee + 
                     (result.feesBreakdown.tax || 0) + 
+                    (result.feesBreakdown.shipping || 0) +
                     (result.feesBreakdown.affiliate || 0);
 
-  // Custos Operacionais e de Produto
-  const totalProdOper = result.totalFixedCosts - result.feesBreakdown.fixedFee;
-  const totalSaleCost = totalProdOper + totalFees;
+  // Custos Operacionais e de Produto (Internos)
+  const totalInternalCosts = result.totalFixedCosts - result.feesBreakdown.fixedFee;
+  const totalSaleCost = totalInternalCosts + totalFees;
   
   // Repasse (O que sobra após taxas do marketplace e impostos, antes de pagar o produto e op)
   const payout = result.sellingPrice - totalFees;
 
   const chartData = [
-    { name: 'Custo Total', value: totalProdOper, color: '#9CA3AF' },
-    { name: 'Taxas & Impostos', value: totalFees, color: '#EF4444' },
+    { name: 'Custo Interno', value: totalInternalCosts, color: '#9CA3AF' },
+    { name: 'Taxas & Marketplace', value: totalFees, color: '#EF4444' },
     { name: 'Lucro Líquido', value: result.netProfit > 0 ? result.netProfit : 0, color: '#10B981' },
   ];
 
   const headerTextColor = colorTheme === 'yellow' ? 'text-gray-900' : 'text-white';
   
-  const displayName = result.platformName
-    .replace(' (Clássico)', '')
-    .replace(' (Premium)', '')
-    .replace(' (Sem Frete Grátis)', '')
-    .replace(' (Com Frete Grátis)', '');
+  const displayName = result.platformName;
 
   return (
     <div className={`rounded-xl shadow-lg overflow-hidden border ${currentTheme.border} ${currentTheme.bg} flex flex-col`}>
@@ -99,29 +96,15 @@ const ResultCard: React.FC<ResultCardProps> = ({
                 </div>
             )}
 
-            {colorTheme === 'orange' && shopeeListingType && onShopeeListingTypeChange && (
-                <div className="mb-6">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Programa Frete Grátis</label>
-                    <div className="flex p-1 bg-orange-50 border border-orange-200 rounded-lg">
-                        <button 
-                          onClick={() => onShopeeListingTypeChange('standard')} 
-                          className={`flex-1 py-1.5 text-[10px] font-bold rounded uppercase transition-all ${shopeeListingType === 'standard' ? 'bg-[#ee4d2d] text-white shadow-sm' : 'text-orange-600 hover:bg-orange-100/50'}`}
-                        >
-                          Sem Frete Grátis
-                        </button>
-                        <button 
-                          onClick={() => onShopeeListingTypeChange('free_shipping')} 
-                          className={`flex-1 py-1.5 text-[10px] font-bold rounded uppercase transition-all ${shopeeListingType === 'free_shipping' ? 'bg-[#ee4d2d] text-white shadow-sm' : 'text-orange-600 hover:bg-orange-100/50'}`}
-                        >
-                          Com Frete Grátis
-                        </button>
-                    </div>
-                </div>
+            {colorTheme === 'orange' && (
+               <div className="hidden">
+                   {/* Shopee Toggle Removed */}
+               </div>
             )}
         </div>
 
         <div className="mb-6 text-center">
-          <p className="text-sm text-gray-500 mb-1">Preço de Venda Final</p>
+          <p className="text-sm text-gray-500 mb-1 font-medium tracking-tight leading-none uppercase text-[10px]">Preço de Venda Final</p>
           <div className={`text-4xl font-bold ${currentTheme.text}`}>
             {formatCurrency(result.sellingPrice)}
           </div>
@@ -129,12 +112,12 @@ const ResultCard: React.FC<ResultCardProps> = ({
 
         <div className="grid grid-cols-2 gap-4 mb-6">
            <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100 text-center">
-              <p className="text-xs text-emerald-700 font-medium uppercase mb-1">Lucro (R$)</p>
-              <p className="text-2xl font-bold text-emerald-600">{formatCurrency(result.netProfit)}</p>
+              <p className="text-[10px] text-emerald-700 font-bold uppercase mb-1">Lucro (R$)</p>
+              <p className="text-xl font-bold text-emerald-600">{formatCurrency(result.netProfit)}</p>
            </div>
            <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100 text-center">
-              <p className="text-xs text-emerald-700 font-medium uppercase mb-1">Margem</p>
-              <p className="text-2xl font-bold text-emerald-600">{formatPercent(result.netProfitMargin)}</p>
+              <p className="text-[10px] text-emerald-700 font-bold uppercase mb-1">Margem</p>
+              <p className="text-xl font-bold text-emerald-600">{formatPercent(result.netProfitMargin)}</p>
            </div>
         </div>
 
@@ -150,36 +133,48 @@ const ResultCard: React.FC<ResultCardProps> = ({
         </div>
 
         <div className="space-y-2 text-sm border-t border-gray-100 pt-4 mt-auto">
-          <div className="flex justify-between text-gray-500">
-            <span>Custos Fixos (Produto + Op):</span>
-            <span>{formatCurrency(totalProdOper)}</span>
+          <div className="flex justify-between text-gray-500 text-[12px]">
+            <span>Custos Internos (Produto + Op):</span>
+            <span className="font-medium">{formatCurrency(totalInternalCosts)}</span>
           </div>
           
           <div className="space-y-1 pt-1">
-            <div className="flex justify-between text-red-500 font-bold border-b border-red-50 pb-1">
+            <div className="flex justify-between text-red-500 font-bold border-b border-red-50 pb-1 text-[13px]">
                <span>Total de Taxas:</span>
                <span>-{formatCurrency(totalFees)}</span>
             </div>
             {/* Detalhamento das Taxas */}
             <div className="pl-2 space-y-0.5 mt-1 border-l-2 border-red-100">
-              <div className="flex justify-between text-[11px] text-gray-400">
+              <div className="flex justify-between text-[11px] text-gray-400 font-medium">
                 <span>Taxa de Comissão:</span>
                 <span>-{formatCurrency(result.feesBreakdown.commission)}</span>
               </div>
-              {result.feesBreakdown.transactionFee > 0 && (
-                <div className="flex justify-between text-[11px] text-gray-400">
+              {(result.feesBreakdown.serviceFee !== undefined && result.platformName === 'Shopee') && (
+                <div className="flex justify-between text-[11px] text-gray-400 font-medium">
+                  <span>Taxa de Comissão de Frete:</span>
+                  <span>-{formatCurrency(result.feesBreakdown.serviceFee || 0)}</span>
+                </div>
+              )}
+              {(result.feesBreakdown.transactionFee || 0) > 0 && (
+                <div className="flex justify-between text-[11px] text-gray-400 font-medium">
                   <span>Taxa de Transação:</span>
-                  <span>-{formatCurrency(result.feesBreakdown.transactionFee)}</span>
+                  <span>-{formatCurrency(result.feesBreakdown.transactionFee || 0)}</span>
                 </div>
               )}
               {result.feesBreakdown.fixedFee > 0 && (
-                <div className="flex justify-between text-[11px] text-gray-400">
+                <div className="flex justify-between text-[11px] text-gray-400 font-medium">
                   <span>Taxa por Item:</span>
                   <span>-{formatCurrency(result.feesBreakdown.fixedFee)}</span>
                 </div>
               )}
+              {(result.feesBreakdown.shipping || 0) > 0 && (
+                <div className="flex justify-between text-[11px] text-gray-500 font-bold italic">
+                  <span>Custo de Frete (ML):</span>
+                  <span>-{formatCurrency(result.feesBreakdown.shipping || 0)}</span>
+                </div>
+              )}
               {(result.feesBreakdown.tax || 0) > 0 && (
-                <div className="flex justify-between text-[11px] text-gray-400">
+                <div className="flex justify-between text-[11px] text-gray-400 font-medium">
                   <span>Imposto:</span>
                   <span>-{formatCurrency(result.feesBreakdown.tax || 0)}</span>
                 </div>
@@ -187,7 +182,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
             </div>
           </div>
 
-           <div className="flex justify-between font-bold text-gray-800 pt-2 border-t border-gray-100 mt-2">
+           <div className="flex justify-between font-bold text-gray-800 pt-2 border-t border-gray-100 mt-2 text-[12px]">
               <span>Custo Total da Venda:</span>
               <span>-{formatCurrency(totalSaleCost)}</span>
            </div>
@@ -195,7 +190,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
            {/* Bloco Repasse Líquido - Verde */}
            <div className="flex justify-between items-center font-bold text-emerald-700 pt-3 border-t-2 border-dashed border-emerald-100 mt-2 bg-emerald-50/50 -mx-6 px-6 py-2">
               <div className="flex flex-col">
-                <span className="text-xs uppercase tracking-wider text-emerald-600 opacity-80">Repasse Líquido</span>
+                <span className="text-[10px] uppercase tracking-wider text-emerald-600 opacity-80 font-black">Repasse Líquido</span>
                 <span className="text-[10px] font-normal text-emerald-500 -mt-1">Cai na conta</span>
               </div>
               <span className="text-xl">{formatCurrency(payout)}</span>
