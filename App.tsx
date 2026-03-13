@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CalculatorInputs from './components/CalculatorInputs';
 import ResultCard from './components/ResultCard';
-import AiInsight from './components/AiInsight';
 import { UserInputs, CalculationMethod, CalculationContext } from './types';
 import { calculateResults } from './utils/calculations';
 
@@ -171,14 +170,6 @@ const App: React.FC = () => {
                       {visiblePlatforms.mercadolivre && <ResultCard result={results.mercadolivre} colorTheme="yellow" mlListingType={inputs.mlListingType} onMlListingTypeChange={(type) => setInputs(prev => ({ ...prev, mlListingType: type }))} />}
                       {visiblePlatforms.amazon && <ResultCard result={results.amazon} colorTheme="blue" />}
                    </div>
-                   <AiInsight 
-                     inputs={inputs}
-                     shopeeResult={results.shopee}
-                     tiktokResult={results.tiktok}
-                     mlResult={results.mercadolivre}
-                     amazonResult={results.amazon}
-                     method={method}
-                   />
                  </>
              ) : (
                 <div className="bg-gray-50 border border-gray-200 border-dashed rounded-xl h-64 flex flex-col items-center justify-center text-center p-6 text-gray-400 font-medium">Ative as plataformas para ver os cálculos.</div>

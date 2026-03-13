@@ -145,15 +145,24 @@ const ResultCard: React.FC<ResultCardProps> = ({
             </div>
             {/* Detalhamento das Taxas */}
             <div className="pl-2 space-y-0.5 mt-1 border-l-2 border-red-100">
-              <div className="flex justify-between text-[11px] text-gray-400 font-medium">
-                <span>Taxa de Comissão:</span>
-                <span>-{formatCurrency(result.feesBreakdown.commission)}</span>
-              </div>
-              {(result.feesBreakdown.serviceFee !== undefined && result.platformName === 'Shopee') && (
+              {result.platformName === 'Shopee' ? (
                 <div className="flex justify-between text-[11px] text-gray-400 font-medium">
-                  <span>Taxa de Comissão de Frete:</span>
-                  <span>-{formatCurrency(result.feesBreakdown.serviceFee || 0)}</span>
+                  <span>Taxa de comissão líquida:</span>
+                  <span>-{formatCurrency((result.feesBreakdown.commission || 0) + (result.feesBreakdown.serviceFee || 0))}</span>
                 </div>
+              ) : (
+                <>
+                  <div className="flex justify-between text-[11px] text-gray-400 font-medium">
+                    <span>Taxa de Comissão:</span>
+                    <span>-{formatCurrency(result.feesBreakdown.commission)}</span>
+                  </div>
+                  {(result.feesBreakdown.serviceFee !== undefined && result.platformName === 'Shopee') && (
+                    <div className="flex justify-between text-[11px] text-gray-400 font-medium">
+                      <span>Taxa de Comissão de Frete:</span>
+                      <span>-{formatCurrency(result.feesBreakdown.serviceFee || 0)}</span>
+                    </div>
+                  )}
+                </>
               )}
               {(result.feesBreakdown.transactionFee || 0) > 0 && (
                 <div className="flex justify-between text-[11px] text-gray-400 font-medium">

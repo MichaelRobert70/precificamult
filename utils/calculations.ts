@@ -19,26 +19,18 @@ const AMAZON_FIXED_FEE = 0.00;
 
 // Tabela de categorias do Mercado Livre conforme PDF/OCR fornecido
 export const ML_CATEGORIES = [
-  { id: 'veiculos', name: 'Acessórios para Veículos', classic: 0.12, premium: 0.17 },
-  { id: 'alimentos', name: 'Alimentos e Bebidas', classic: 0.12, premium: 0.17 },
-  { id: 'bebes', name: 'Bebês', classic: 0.115, premium: 0.165 },
-  { id: 'beleza', name: 'Beleza e Cuidado Pessoal', classic: 0.13, premium: 0.18 },
-  { id: 'brinquedos', name: 'Brinquedos e Hobbies', classic: 0.115, premium: 0.165 },
   { id: 'calcados', name: 'Calçados, Roupas e Bolsas', classic: 0.14, premium: 0.19 },
-  { id: 'cameras', name: 'Câmeras e Acessórios', classic: 0.11, premium: 0.16 },
-  { id: 'casa', name: 'Casa, Móveis e Decoração', classic: 0.115, premium: 0.165 },
-  { id: 'celulares', name: 'Celulares e Smartphones', classic: 0.11, premium: 0.16 },
-  { id: 'eletrodomesticos', name: 'Eletrodomésticos', classic: 0.11, premium: 0.16 },
   { id: 'eletronicos', name: 'Eletrônicos, Áudio e Vídeo', classic: 0.13, premium: 0.18 },
-  { id: 'esportes', name: 'Esportes e Fitness', classic: 0.13, premium: 0.18 },
-  { id: 'ferramentas', name: 'Ferramentas e Construção', classic: 0.115, premium: 0.165 },
   { id: 'games', name: 'Games', classic: 0.13, premium: 0.18 },
-  { id: 'informatica', name: 'Informática (Notebooks, etc)', classic: 0.11, premium: 0.16 },
-  { id: 'musicais', name: 'Instrumentos Musicais', classic: 0.115, premium: 0.165 },
   { id: 'joias', name: 'Joias e Relógios', classic: 0.125, premium: 0.175 },
-  { id: 'livros', name: 'Livros', classic: 0.12, premium: 0.17 },
-  { id: 'pet', name: 'Pet Shop', classic: 0.12, premium: 0.17 },
-  { id: 'saude', name: 'Saúde', classic: 0.12, premium: 0.17 },
+  { id: 'saude', name: 'Saúde, Perfumaria e Cosméticos', classic: 0.12, premium: 0.17 },
+  { id: 'suplementos', name: 'Suplementos Alimentares', classic: 0.12, premium: 0.17 },
+  { id: 'casa', name: 'Casa, Móveis e Decoração', classic: 0.115, premium: 0.165 },
+  { id: 'ferramentas', name: 'Ferramentas e Construção', classic: 0.115, premium: 0.165 },
+  { id: 'brinquedos', name: 'Brinquedos e Hobbies', classic: 0.115, premium: 0.165 },
+  { id: 'veiculos', name: 'Peças e Acessórios para Veículos', classic: 0.12, premium: 0.17 },
+  { id: 'informatica', name: 'Informática (Notebooks, Celulares)', classic: 0.11, premium: 0.16 },
+  { id: 'eletrodomesticos', name: 'Eletrodomésticos', classic: 0.11, premium: 0.16 },
 ];
 
 const getNumber = (value: number | string): number => {
@@ -52,7 +44,7 @@ const getMLFixedFee = (price: number): number => {
   if (price > 50.00) return 6.75;
   if (price > 29.00) return 6.50;
   if (price >= 12.50) return 6.25;
-  return price * 0.50; 
+  return 0; 
 };
 
 export const calculateResults = (inputs: UserInputs, method: CalculationMethod): { shopee: PlatformResult, tiktok: PlatformResult, mercadolivre: PlatformResult, amazon: PlatformResult } => {
@@ -245,14 +237,8 @@ const calculateMercadoLivre = (inputs: UserInputs, method: CalculationMethod): P
             sellingPrice = sp625;
             appliedFixedFee = 6.25;
           } else {
-            const denominator = 1 - variableRate - 0.5;
-            if (denominator > 0) {
-              sellingPrice = requiredPayout / denominator;
-              appliedFixedFee = sellingPrice * 0.5;
-            } else {
-              sellingPrice = 12.50; 
-              appliedFixedFee = 6.25;
-            }
+            sellingPrice = requiredPayout / (1 - variableRate);
+            appliedFixedFee = 0;
           }
         }
       }
