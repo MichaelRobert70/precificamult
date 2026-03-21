@@ -7,9 +7,9 @@ const SHOPEE_SERVICE_RATE = 0.06; // 6% Taxa de Serviço (Programa Frete Grátis
 const SHOPEE_TRANSACTION_RATE = 0.02; // 2% Taxa de Transação
 const SHOPEE_COMMISSION_CAP = 100.00; // Teto da comissão padrão (R$ 100)
 
-const TIKTOK_COMMISSION_RATE = 0.12;
-const TIKTOK_FIXED_FEE_THRESHOLD = 79.00;
-const TIKTOK_FIXED_FEE_VALUE = 2.00;
+const TIKTOK_COMMISSION_RATE = 0.06; // 6% Comissão 2026
+const TIKTOK_FIXED_FEE = 4.00; // R$ 4.00 Fixo 2026
+const TIKTOK_FREE_SHIPPING_RATE = 0.06; // 6% Programa Frete Grátis (SFP) conforme dados reais do usuário
 
 const ML_DEFAULT_CLASSIC = 0.14; 
 const ML_DEFAULT_PREMIUM = 0.19;
@@ -155,39 +155,39 @@ const calculateTikTok = (inputs: UserInputs, method: CalculationMethod): Platfor
   const targetMarginDecimal = getNumber(inputs.targetMargin) / 100;
   const testPrice = getNumber(inputs.testPrice);
   const taxRateDecimal = inputs.isCNPJ ? getNumber(inputs.taxRate) / 100 : 0;
-  const variableRate = TIKTOK_COMMISSION_RATE + taxRateDecimal;
+  
+  // Taxas TikTok 2026: 6% Comissão + 2% Frete Grátis + Impostos
+  const variableRate = TIKTOK_COMMISSION_RATE + TIKTOK_FREE_SHIPPING_RATE + taxRateDecimal;
   const desiredProfit = productCost * targetMarginDecimal;
 
   let sellingPrice = 0;
-  let appliedFixedFee = 0;
+  const appliedFixedFee = TIKTOK_FIXED_FEE;
 
   if (method === CalculationMethod.TARGET_MARGIN) {
-    const requiredPayoutWithFee = desiredProfit + productCost + operationalCost + TIKTOK_FIXED_FEE_VALUE;
-    const requiredPayoutNoFee = desiredProfit + productCost + operationalCost;
-    const spWithFee = requiredPayoutWithFee / (1 - variableRate);
-    const spNoFee = requiredPayoutNoFee / (1 - variableRate);
-    if (spWithFee < TIKTOK_FIXED_FEE_THRESHOLD) {
-      sellingPrice = spWithFee;
-      appliedFixedFee = TIKTOK_FIXED_FEE_VALUE;
-    } else {
-      sellingPrice = spNoFee;
-      appliedFixedFee = 0;
-    }
+    const requiredPayout = desiredProfit + productCost + operationalCost + appliedFixedFee;
+    sellingPrice = requiredPayout / (1 - variableRate);
   } else {
     sellingPrice = testPrice;
-    appliedFixedFee = sellingPrice < TIKTOK_FIXED_FEE_THRESHOLD ? TIKTOK_FIXED_FEE_VALUE : 0;
   }
 
-  const commissionValue = sellingPrice * TIKTOK_COMMISSION_RATE;
-  const taxValue = sellingPrice * taxRateDecimal;
-  const payout = sellingPrice - (commissionValue + taxValue + appliedFixedFee);
+  const commissionValue = Math.round(sellingPrice * TIKTOK_COMMISSION_RATE * 100) / 100;
+  const freeShippingValue = Math.round(sellingPrice * TIKTOK_FREE_SHIPPING_RATE * 100) / 100;
+  const taxValue = Math.round(sellingPrice * taxRateDecimal * 100) / 100;
+  const payout = sellingPrice - (commissionValue + freeShippingValue + taxValue + appliedFixedFee);
   const netProfit = payout - (productCost + operationalCost);
   const netProfitMargin = productCost > 0 ? (netProfit / productCost) * 100 : 0;
 
   return {
     platformName: 'TikTok Shop', sellingPrice, netProfit, netProfitMargin, productBaseCost: productCost,
-    totalFixedCosts: (productCost + operationalCost) + appliedFixedFee, totalVariableCosts: commissionValue,
-    feesBreakdown: { commission: commissionValue, transactionFee: 0, fixedFee: appliedFixedFee, tax: taxValue }
+    totalFixedCosts: (productCost + operationalCost) + appliedFixedFee, 
+    totalVariableCosts: commissionValue + freeShippingValue + taxValue,
+    feesBreakdown: { 
+      commission: commissionValue, 
+      serviceFee: freeShippingValue, // Usando serviceFee para o Frete Grátis
+      transactionFee: 0, 
+      fixedFee: appliedFixedFee, 
+      tax: taxValue 
+    }
   };
 };
 

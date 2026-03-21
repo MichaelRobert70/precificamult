@@ -156,9 +156,9 @@ const ResultCard: React.FC<ResultCardProps> = ({
                     <span>Taxa de Comissão:</span>
                     <span>-{formatCurrency(result.feesBreakdown.commission)}</span>
                   </div>
-                  {(result.feesBreakdown.serviceFee !== undefined && result.platformName === 'Shopee') && (
+                  {(result.feesBreakdown.serviceFee !== undefined && (result.platformName === 'Shopee' || result.platformName === 'TikTok Shop')) && (
                     <div className="flex justify-between text-[11px] text-gray-400 font-medium">
-                      <span>Taxa de Comissão de Frete:</span>
+                      <span>Taxa de Frete Grátis:</span>
                       <span>-{formatCurrency(result.feesBreakdown.serviceFee || 0)}</span>
                     </div>
                   )}
